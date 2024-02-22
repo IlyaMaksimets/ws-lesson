@@ -1,12 +1,12 @@
-import { useState, useEffect, useContext } from "react";
 import '../styles/LoginPage.css';
-import {Context} from "../../contexts.js"
+import { useState, useEffect, useContext } from "react";
+import { Navigate } from "react-router-dom";
 
-export default function LoginPage({socket}) {
+export default function LoginPage({socket, setToken}) {
     const [login, setLogin] = useState();
     const [password, setPassword] = useState();
     const [isConnected, setIsConnected] = useState(socket.connected);
-    const {setToken} = useContext(Context);
+    const [pong, setPong] = useState(false)
 
     useEffect(() => {
         function onConnect() {
@@ -18,7 +18,7 @@ export default function LoginPage({socket}) {
         }
 
         function onGetTokenEvent(value) {
-            console.log(value);
+            setPong(true)
             setToken(value);
         }
 
@@ -43,10 +43,10 @@ export default function LoginPage({socket}) {
             socket.emit('get-token');
             setLogin(login);
             setPassword(password);
-            window.location.href = "http://localhost:3000/home";
         }
         }
         >Submit</button>
+        {pong && <Navigate to="/home" replace={true}/>}
     </>
     );
 }

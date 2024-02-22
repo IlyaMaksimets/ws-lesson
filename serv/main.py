@@ -1,4 +1,5 @@
 import secrets
+import datetime
 
 from flask import Flask
 from flask_socketio import SocketIO, emit
@@ -9,7 +10,8 @@ socket = SocketIO(app, debug=True, cors_allowed_origins='*')
 
 @socket.on("msg")
 def msg(message):
-    emit("new-msg", message, broadcast=True)
+    time = datetime.datetime.now().strftime("%H:%M")
+    emit("new-msg", {**message, "time": time}, broadcast=True)
 
 
 @socket.on("get-token")

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import LoginPage from "./components/pages/LoginPage.js";
 import HomePage from "./components/pages/HomePage.js";
-import {Context} from "./contexts.js"
 
 const socket = io("localhost:5000");
 
@@ -12,6 +11,16 @@ const socket = io("localhost:5000");
 function App() {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [token, setToken] = useState("---");
+
+    useEffect(()=>{
+        console.log(token)
+    }
+    ,[token])
+
+    useEffect(()=>{
+            console.log("mount")
+        }
+        ,[])
 
     useEffect(() => {
         function onConnect() {
@@ -37,17 +46,19 @@ function App() {
         };
     }, [socket]);
 
+
+    function handleToken(value){
+        console.log(value)
+        setToken(v => value)
+    }
+
     return (
-    <Context.Provider value={{token, setToken: t=>setToken(t)}}>
         <BrowserRouter>
             <Routes>
-
-                <Route path="/home" element={<HomePage socket={socket}/>}/>
-                <Route path="/login" element={<LoginPage socket={socket}/>} />
-
+                <Route path="/home" element={<HomePage token={token} socket={socket}/>}/>
+                <Route path="/login" element={<LoginPage setToken={handleToken} socket={socket}/>} />
             </Routes>
         </BrowserRouter>
-        </Context.Provider>
     );
 
 }

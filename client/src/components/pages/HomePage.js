@@ -1,21 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import '../styles/HomePage.css';
-import Message from '../elements/Message.js'
-import {Context} from "../../contexts.js"
+import Message from '../elements/Message.js';
 
-function sendMessage(message){
-    console.log(message);
-}
-
-export default function HomePage({socket}) {
+export default function HomePage({socket, token}) {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [messages, setMessages] = useState([]);
     const [actualMessage, setActualMessage] = useState();
-    const {token} = useContext(Context);
-
-    useEffect(()=>{
-        console.log(token)
-    }, [token])
 
     useEffect(() => {
         function onConnect() {
@@ -27,8 +17,9 @@ export default function HomePage({socket}) {
         }
 
         function onMsgEvent(value) {
-            setMessages(m => [...m, value]);
-            sendMessage(value);
+        console.log(value);
+        console.log(messages);
+        setMessages(m => [...m, {msg: value.actualMessage, isMine: token === value.token, time: value.time}]);
         }
 
         socket.on('connect', onConnect);
@@ -45,17 +36,17 @@ export default function HomePage({socket}) {
     }, [socket]);
 
     return (
-    <>
+    <><div className="inputcont">
         <input type="text" value={actualMessage} onChange={(event) => setActualMessage(a => event.target.value)}/>
         <button className="submitButton" onClick = {() => {
             setActualMessage(a => actualMessage);
-            socket.emit('msg', actualMessage);
-            console.log(messages);
+            socket.emit('msg', {actualMessage, token});
         }
         }
         >Submit
         </button>
-        {messages.map((msg) => <Message msg={msg}/>)}
+        </div>
+        {messages.map((value) => <Message value={value}/>)}
     </>
     );
 }
