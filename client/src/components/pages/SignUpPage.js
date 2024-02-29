@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom";
 
 export default function LoginPage({socket, setLogin, login}) {
     const [password, setPassword] = useState();
+    const [passwordConfirmation, setPasswordConfirmation] = useState();
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [pong, setPong] = useState(false)
 
@@ -44,10 +45,9 @@ export default function LoginPage({socket, setLogin, login}) {
     <>
         <input type="text" value={login} onChange={(event) => setLogin(event.target.value)}/>
         <input type="text" value={password} onChange={(event) => setPassword(event.target.value)}/>
+        <input type="text" value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)}/>
         <button className="submitButton" onClick = {() => {
-            socket.emit('auth-user', {login, password});
-            setLogin(login);
-            setPassword(password);
+            socket.emit('auth-user', {login, password, passwordConfirmation});
         }
         }
         >Submit</button>
