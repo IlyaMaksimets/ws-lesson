@@ -1,8 +1,10 @@
 import '../styles/LoginPage.css';
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import url from '../../utils.js'
 
-export default function LoginPage({socket, setLogin, login}) {
+export default function LoginPage({socket, setToken, token, messages, setMessages}) {
+    const [login, setLogin] = useState();
     const [password, setPassword] = useState();
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [pong, setPong] = useState(false)
@@ -16,25 +18,18 @@ export default function LoginPage({socket, setLogin, login}) {
             setIsConnected(false);
         }
 
-        function onAuthUserEvent(value) {
-            setPong(true);
-            setLogin(value.login);
-        }
-
         function onErrorEvent() {
             setPong(false);
         }
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
-        socket.on('auth-user-success', onAuthUserEvent);
         socket.on('error', onErrorEvent);
         socket.connect();
 
         return () => {
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
-            socket.off('auth-user-success', onAuthUserEvent);
             socket.off('error', onErrorEvent);
             socket.disconnect();
         };
@@ -45,9 +40,18 @@ export default function LoginPage({socket, setLogin, login}) {
         <input type="text" value={login} onChange={(event) => setLogin(event.target.value)}/>
         <input type="text" value={password} onChange={(event) => setPassword(event.target.value)}/>
         <button className="submitButton" onClick = {() => {
-            socket.emit('auth-user', {login, password});
-            setLogin(login);
-            setPassword(password);
+            fetch(url('/login'), {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({login, password})
+            }).then((response) => {
+                if (response.status === 200) {
+                    setToken(response.json.token)
+                    setMessages(response.json.msg)
+                    setPong(true);
+                }
+            })
         }
         }
         >Submit</button>

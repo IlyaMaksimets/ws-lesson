@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
 import '../styles/Message.css';
 
-export default function Message({ value, login }){
+export default function Message({ value, token }){
     return(
         <>
-            {value.login == login && <div class="myMsg">{value.msg} <p class="myMsgTime">{value.time}</p></div>}
-            {value.login != login && <div class="notMyMsg">{value.msg} <p class="notMyMsgTime">{value.time}</p></div>}
+            {value.token == token && <div class="myMsg">{value.msg} <p class="myMsgTime">{value.time}</p></div>}
+            {value.token != token && <div class="notMyMsg">{value.msg} <p class="notMyMsgTime">{value.time}</p></div>}
         </>
     )
 }

@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import '../styles/HomePage.css';
 import Message from '../elements/Message.js';
 
-export default function HomePage({socket, login}) {
+export default function HomePage({socket, token, messages, setMessages}) {
     const [isConnected, setIsConnected] = useState(socket.connected);
-    const [messages, setMessages] = useState([]);
     const [actualMessage, setActualMessage] = useState();
 
     useEffect(() => {
         function onConnect() {
             setIsConnected(true);
-            emit('get-all-msg');
         }
 
         function onDisconnect() {
@@ -18,14 +16,13 @@ export default function HomePage({socket, login}) {
         }
 
         function onMsgEvent(value) {
-            setMessages(m => [...m, {msg: value.msg, login: value.login, time: value.time}]);
-            console.log({msg: value.msg, login: value.login, time: value.time})
+            setMessages(m => [...m, {token: value.token, msg: value.msg, time: value.time}]);
+            console.log({token: value.token, msg: value.msg, time: value.time})
         }
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('new-msg', onMsgEvent);
-        socket.on('all-msg', onAllMsgEvent);
         socket.connect();
 
         return () => {
@@ -37,17 +34,18 @@ export default function HomePage({socket, login}) {
     }, [socket]);
 
     return (
-    <><div className="inputcont">
+    <>
+        <div className="inputcont">
         <input type="text" value={actualMessage} onChange={(event) => setActualMessage(a => event.target.value)}/>
         <button className="submitButton" onClick = {() => {
             setActualMessage(actualMessage);
-            socket.emit('msg', {msg: actualMessage, login});
+            socket.emit('msg', {msg: actualMessage, token});
         }
         }
         >Submit
         </button>
         </div>
-        {messages.map((value) => <Message value={value} login={login}/>)}
+        {messages.map((value) => <Message value={value} token={token}/>)}
     </>
     );
 }

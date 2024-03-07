@@ -1,31 +1,38 @@
 import secrets
+from cfg import TOKEN_HALF_LENGTH
+from models import User, Message, Token, db
 
-from models import User, Message, db
+
+def get_user_id(data):
+    return list(db.session.execute(db.select(Token).where(Token.id == data["token"])).scalars())[0]["user_id"]
 
 
-def set_user(data):
-    users = list(db.session.execute(db.select(User).where(User.username == data["login"])).scalars())
-    if len(data) > 2:
-        if len(users):
-            return "user-exists"
-        else:
-            if data["password"] != data["passwordConfirmation"]:
-                return "different-passwords"
-            else:
-                db.session.execute(
-                    db.insert(User).values(id=secrets.token_hex(10), username=data["login"], password=data["password"]))
-                db.session.commit()
-                return "done"
-    else:
-        if not len(users):
-            return "user-not-exists"
-        else:
-            if users[0].password != data["password"]:
-                return "incorrect-password"
-            else:
-                return "done"
+def get_token(data):
+    user_id = get_user_id(data)
+    return list(db.session.execute(db.select(Token).where(Token.user_id == user_id)).scalars())[0]["id"]
+
+
+def create_user(data):
+    db.session.execute(
+        db.insert(User).values(id=secrets.token_hex(TOKEN_HALF_LENGTH), login=data["login"], password=data["password"]))
+    db.session.commit()
+    return get_token(data)
 
 
 def save_message(data):
-    db.session.execute(db.insert(Message).values(user=data["login"], msg=data["msg"], time=data["time"]))
+    user_id = get_user_id(data)
+    db.session.execute(
+        db.insert(Message).values(id=secrets.token_hex(TOKEN_HALF_LENGTH), user_id=user_id, msg=data["msg"],
+                                  time=data["time"]))
     db.session.commit()
+
+
+def get_messages(data):
+    user_id = get_user_id(data)
+    got_data = list(db.session.execute(db.select(Message).where(Message.user_id == user_id)).scalars())
+    messages = []
+    for message in got_data:
+        messages.append(
+            {"id": secrets.token_hex(TOKEN_HALF_LENGTH), "login": message.user_id, "msg": message.msg,
+             "time": message.time})
+    return messages
