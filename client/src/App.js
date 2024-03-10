@@ -43,7 +43,7 @@ function App() {
             <Routes>
                 <Route path="/home" element={<HomePage token={token} socket={socket} messages={messages} setMessages={setMessages}/>}/>
                 <Route path="/login" element={<LoginPage token={token} setToken={setToken} socket={socket} messages={messages} setMessages={setMessages}/>}/>
-                <Route path="/register" element={<SignUpPage token={token} setLogin={setToken} socket={socket} messages={messages}/>}/>
+                <Route path="/register" element={<SignUpPage token={token} setToken={setToken} socket={socket} setMessages={setMessages}/>}/>
             </Routes>
         </BrowserRouter>
     );

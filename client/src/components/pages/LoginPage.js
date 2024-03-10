@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import url from '../../utils.js'
 
-export default function LoginPage({socket, setToken, token, messages, setMessages}) {
-    const [login, setLogin] = useState();
-    const [password, setPassword] = useState();
+export default function LoginPage({socket, setToken, setMessages}) {
+    const [login, setLogin] = useState("");
+    const [password, setPassword] = useState("");
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [pong, setPong] = useState(false)
 
@@ -41,14 +41,15 @@ export default function LoginPage({socket, setToken, token, messages, setMessage
         <input type="text" value={password} onChange={(event) => setPassword(event.target.value)}/>
         <button className="submitButton" onClick = {() => {
             fetch(url('/login'), {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({login, password})
-            }).then((response) => {
-                if (response.status === 200) {
-                    setToken(response.json.token)
-                    setMessages(response.json.msg)
+            }).then(response => response.json()).then(data => {
+                if (data.status === 200) {
+                    setToken(data.token)
+                    setMessages(data.msg)
                     setPong(true);
                 }
             })

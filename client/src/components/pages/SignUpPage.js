@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import url from '../../utils.js'
 
-export default function LoginPage({socket, setToken, token, messages}) {
-    const [login, setLogin] = useState();
-    const [password, setPassword] = useState();
+export default function LoginPage({socket, setToken, setMessages}) {
+    const [login, setLogin] = useState("");
+    const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState();
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [pong, setPong] = useState(false)
@@ -42,18 +42,21 @@ export default function LoginPage({socket, setToken, token, messages}) {
         <input type="text" value={password} onChange={(event) => setPassword(event.target.value)}/>
         <input type="text" value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)}/>
         <button className="submitButton" onClick = {() => {
-            fetch(url('/register'), {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({login, password})
-            }).then((response) => {
-                if (response.status === 200) {
-                    setToken(response.json.token)
-                    setPong(true);
-                }
-            })
+            if (password === passwordConfirmation) {
+                fetch(url('/register'), {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({login, password})
+                }).then(response => response.json()).then(data => {
+                    if (data.status === 200) {
+                        setToken(data.token)
+                        setMessages(data.msg)
+                        setPong(true);
+                    }
+                })
+            }
         }
         }
         >Submit</button>
