@@ -4,7 +4,7 @@ from flask import Flask
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from models import db
-from db_funcs import save_message
+from db_queries import save_message
 from routes import simple_page
 
 app = Flask(__name__)

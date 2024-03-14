@@ -12,7 +12,7 @@ const socket = io("localhost:5000");
 function App() {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [token, setToken] = useState("");
-    const [messages, setMessages] = useState([]);
+    const [actualMessages, setactualMessages] = useState([]);
 
     useEffect(() => {
         function onConnect() {
@@ -41,8 +41,8 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/home" element={<HomePage token={token} socket={socket} messages={messages} setMessages={setMessages}/>}/>
-                <Route path="/login" element={<LoginPage token={token} setToken={setToken} socket={socket} messages={messages} setMessages={setMessages}/>}/>
+                <Route path="/home" element={<HomePage token={token} socket={socket} actualMessages={actualMessages} setactualMessages={setactualMessages}/>}/>
+                <Route path="/login" element={<LoginPage token={token} setToken={setToken} socket={socket} actualMessages={actualMessages} setactualMessages={setactualMessages}/>}/>
                 <Route path="/register" element={<SignUpPage token={token} setToken={setToken} socket={socket} setMessages={setMessages}/>}/>
             </Routes>
         </BrowserRouter>

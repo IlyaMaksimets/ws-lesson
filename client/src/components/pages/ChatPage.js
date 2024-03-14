@@ -1,10 +1,10 @@
 import {useState, useEffect} from "react";
-import '../styles/HomePage.css';
+import '../styles/ChatOpened.css';
 import Message from '../elements/Message.js';
 
-export default function HomePage({socket, token}) {
+export default function ChatOpened({socket, token, messages, setMessages}) {
     const [isConnected, setIsConnected] = useState(socket.connected);
-    const [chats, setChats] = useState([]);
+    const [actualMessage, setActualMessage] = useState();
     useEffect(() => {
         function onConnect() {
             setIsConnected(true);
@@ -15,7 +15,7 @@ export default function HomePage({socket, token}) {
         }
 
         function onMsgEvent(value) {
-            //...
+            setMessages(m => [...m, {token: value.token, msg: value.msg, time: value.time, isMine: value.token == token}]);
         }
 
         socket.on('connect', onConnect);
@@ -33,7 +33,17 @@ export default function HomePage({socket, token}) {
 
     return (
         <>
-            {chats.map((chat) => <ChatHidden type=chat.type name=chat.name actualMessage= author=/>)}
+            <div className="inputcont">
+                <input type="text" value={actualMessage}
+                       onChange={(event) => setActualMessage(event.target.value)}/>
+                <button className="submitButton" onClick={() => {
+                    socket.emit('msg', {msg: actualMessage, token});
+                }
+                }
+                >Submit
+                </button>
+            </div>
+            {messages.map((value) => <Message value={value}/>)}
         </>
     );
 }
