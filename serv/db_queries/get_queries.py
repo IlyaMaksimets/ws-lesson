@@ -1,4 +1,5 @@
-from serv.models import User, Message, Token, db
+from serv.models import *
+from sqlalchemy import desc
 
 
 def user_exists(data):
@@ -19,9 +20,13 @@ def get_token(data):
     return list(db.session.execute(db.select(Token).where(Token.user_id == user_id)).scalars())[0].id
 
 
-def get_messages(data):
+def get_actual_messages(data):
     user_id = get_user_id_by_token(data)
-    got_data = list(db.session.execute(db.select(Message)).scalars())
+    chats_id = get_chats_id(data["user_id"])
+    chats_id_keys = []
+    for chat_id in chats_id:
+        chats_id_keys.append(chat_id.chat_id)
+    got_data = list(db.session.execute(db.select(Message)).where(Message.chat_id in chats_id_keys).order_by(desc(Message.)).scalars())
     messages = []
     for msg in got_data:
         messages.append(
@@ -30,5 +35,17 @@ def get_messages(data):
     return messages
 
 
-def get_user_chats(data):
-    pass
+def get_chats_id(data):
+    return list(db.session.execute(db.select(UserChat).where(UserChat.user_id == data["user_id"])))
+
+
+def get_chats(data):
+    chats_id = get_chats_id(data)
+    return list(db.session.execute(db.select(Chat).where(Chat.id in chats_id)))
+
+
+def get_chat_messages(data):
+    messages = list(db.session.execute(db.select(Message).where(Message.chat_id == data["chat_id"])))
+    for msg in messages:
+        msg.time = msg.time.strftime("%H:%M")
+    return messages

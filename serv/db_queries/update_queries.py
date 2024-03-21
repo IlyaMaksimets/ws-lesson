@@ -2,8 +2,7 @@ import datetime
 import secrets
 
 from serv.cfg import TOKEN_HALF_LENGTH
-from serv.models import User, Message, Token, db
-from .get_queries import get_token, get_user_id_by_token, get_user_id_by_login
+from .get_queries import *
 
 
 def create_user(data):
@@ -26,16 +25,27 @@ def save_message(data):
 
 
 def delete_user(data):
-    pass
+    user_id = get_user_id_by_token(data)
+    db.session.execute(db.delete(UserChat).where(UserChat.user_id == user_id))
+    db.session.execute(db.delete(User).where(User.id == user_id))
+    db.session.commit()
 
 
 def create_chat(data):
-    pass
+    user_id = get_user_id_by_token(data)
+    chat_id = secrets.token_hex(TOKEN_HALF_LENGTH)
+    db.session.execute(db.insert(Chat).values(id=chat_id, name=data["chatName"], type=data["chatType"], owner_id=user_id))
+    db.session.execute(db.insert(UserChat).values(user_id=user_id, chat_id=chat_id))
+    db.session.commit()
 
 
 def delete_chat(data):
-    pass
+    db.session.execute(db.delete(UserChat).where(UserChat.chat_id == data["chat_id"]))
+    db.session.execute(db.delete(Chat).where(Chat.id == data["chat_id"]))
+    db.session.commit()
 
 
 def add_user_to(data):
-    pass
+    user_id = get_user_id_by_token(data)
+    db.session.execute(db.insert(UserChat).values(user_id=user_id, chat_id=data["chat_id"]))
+    db.session.commit()

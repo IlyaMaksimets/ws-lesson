@@ -12,7 +12,7 @@ def login_query():
     else:
         res = get_token(request.json)
         if len(res) == 2 * TOKEN_HALF_LENGTH:
-            return {"status": 200, "token": res, "msg": get_messages({**request.json, "token": res})}
+            return {"status": 200, "token": res, "actualMessages": get_actual_messages({**request.json, "token": res})}
         else:
             abort(401)
 
@@ -24,7 +24,7 @@ def register_query():
     else:
         res = create_user(request.json)
         if len(res) == 2 * TOKEN_HALF_LENGTH:
-            return {"status": 200, "token": res, "msg": get_messages({**request.json, "token": res})}
+            return {"status": 200, "token": res, "msg": get_actual_messages({**request.json, "token": res})}
         else:
             abort(401)
 
@@ -36,12 +36,13 @@ def delete_user_query():
 
 @simple_page.route('/create_chat', methods=["POST"])
 def create_chat_query():
-    create_chat({"name": request.json["name"], "type": request.json["type"]})
+    create_chat(
+        {"chatName": request.json["chatName"], "chatType": request.json["chatType"], "token": request.json["token"]})
 
 
 @simple_page.route('/delete_chat', methods=["POST"])
 def delete_chat_query():
-    delete_chat({"name": request.json["name"], "chat_id": request.json["chat_id"]})
+    delete_chat({"chat_id": request.json["chat_id"]})
 
 
 @simple_page.route('/add_user_to', methods=["POST"])
@@ -51,4 +52,9 @@ def add_user_to_query():
 
 @simple_page.route('/get_chats', methods=["POST"])
 def get_chats_query():
-    get_user_chats({"token": request.json["token"]})
+    return {"chats": get_chats({"token": request.json["token"]})}
+
+
+@simple_page.route('/get_messages', methods=["POST"])
+def get_chat_messages_query():
+    return {"msg": get_chat_messages({"chat_id": request.json["chat_id"]})}

@@ -18,7 +18,7 @@ CORS(app)
 @socket.on("msg")
 def msg(data):
     time = datetime.datetime.now().strftime("%H:%M")
-    save_message({**data, "time": time})
+    save_message({**data, "time": datetime.datetime.now()})
     emit("new-msg", {**data, "time": time}, broadcast=True)
 
 

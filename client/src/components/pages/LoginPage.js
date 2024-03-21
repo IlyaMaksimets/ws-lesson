@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import url from '../../utils.js'
 
-export default function LoginPage({socket, setToken, setMessages}) {
+export default function LoginPage({state, dispatch}) {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [isConnected, setIsConnected] = useState(socket.connected);
@@ -48,8 +48,7 @@ export default function LoginPage({socket, setToken, setMessages}) {
                 body: JSON.stringify({login, password})
             }).then(response => response.json()).then(data => {
                 if (data.status === 200) {
-                    setToken(data.token)
-                    setMessages(data.msg)
+                    dispatch({"type": "user_auth", "token": data.token, "actualMessages": data.actualMessages})
                     setPong(true);
                 }
             })

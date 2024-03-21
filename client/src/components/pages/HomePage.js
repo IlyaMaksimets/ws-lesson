@@ -2,12 +2,23 @@ import {useState, useEffect} from "react";
 import '../styles/HomePage.css';
 import Message from '../elements/Message.js';
 
-export default function HomePage({socket, token}) {
+export default function HomePage({state, dispatch}) {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [chats, setChats] = useState([]);
     useEffect(() => {
         function onConnect() {
             setIsConnected(true);
+            fetch(url('/get_chats'), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({state.token}).then(data => {
+                    if (data.status === 200) {
+                        setChats(data.chats)
+                    }
+                })
+            })
         }
 
         function onDisconnect() {
@@ -15,7 +26,9 @@ export default function HomePage({socket, token}) {
         }
 
         function onMsgEvent(value) {
-            //...
+            setChats(c => {
+                c[value.chat_id].actualMsg = value.msg
+            })
         }
 
         socket.on('connect', onConnect);
@@ -33,7 +46,13 @@ export default function HomePage({socket, token}) {
 
     return (
         <>
-            {chats.map((chat) => <ChatHidden type=chat.type name=chat.name actualMessage= author=/>)}
+            {
+            chats.map((chat) => <ChatHidden state={state} dispatch={dispatch} chatInfo={{"chatId": chat.id,
+                                                                                        "chatType": chat.type,
+                                                                                        "chatName": chat.name,
+                                                                                        "actualMessage": chat.actualMessage,
+                                                                                        "author": chat.author}}/>)}
+            }
         </>
     );
 }

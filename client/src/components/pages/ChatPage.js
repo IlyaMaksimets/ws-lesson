@@ -2,12 +2,24 @@ import {useState, useEffect} from "react";
 import '../styles/ChatOpened.css';
 import Message from '../elements/Message.js';
 
-export default function ChatOpened({socket, token, messages, setMessages}) {
+export default function ChatPage({state, dispatch}) {
     const [isConnected, setIsConnected] = useState(socket.connected);
+    const [messages, setMessages] = useState();
     const [actualMessage, setActualMessage] = useState();
     useEffect(() => {
         function onConnect() {
             setIsConnected(true);
+            fetch(url('/get_messages'), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({token}).then(data => {
+                    if (data.status === 200) {
+                        setChats(data.chats)
+                    }
+                })
+            })
         }
 
         function onDisconnect() {

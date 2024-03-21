@@ -1,18 +1,13 @@
 import './App.css';
-import { io } from 'socket.io-client';
 import { useState, useEffect } from "react";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import LoginPage from "./components/pages/LoginPage.js";
 import SignUpPage from "./components/pages/SignUpPage.js";
 import HomePage from "./components/pages/HomePage.js";
 
-const socket = io("localhost:5000");
-
-
 function App() {
+    const [state, dispatch] = useReducer(reducer, fillState);
     const [isConnected, setIsConnected] = useState(socket.connected);
-    const [token, setToken] = useState("");
-    const [actualMessages, setactualMessages] = useState([]);
 
     useEffect(() => {
         function onConnect() {
@@ -21,10 +16,6 @@ function App() {
 
         function onDisconnect() {
             setIsConnected(i => false);
-        }
-
-        function onFooEvent(value) {
-            console.log(value)
         }
 
         socket.on('connect', onConnect);
@@ -41,9 +32,9 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/home" element={<HomePage token={token} socket={socket} actualMessages={actualMessages} setactualMessages={setactualMessages}/>}/>
-                <Route path="/login" element={<LoginPage token={token} setToken={setToken} socket={socket} actualMessages={actualMessages} setactualMessages={setactualMessages}/>}/>
-                <Route path="/register" element={<SignUpPage token={token} setToken={setToken} socket={socket} setMessages={setMessages}/>}/>
+                <Route path="/home" element={<HomePage state={state} dispatch={dispatch}/>}/>
+                <Route path="/login" element={<LoginPage state={state} dispatch={dispatch}/>}/>
+                <Route path="/register" element={<SignUpPage state={state} dispatch={dispatch}/>}/>
             </Routes>
         </BrowserRouter>
     );
