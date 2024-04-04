@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, abort, send_from_directory
 from db_funcs import *
 from cfg import *
 
@@ -27,3 +27,8 @@ def register():
             return {"status": 200, "token": res, "msg": get_messages({**request.json, "token": res})}
         else:
             abort(401)
+
+
+# @simple_page.route('/<path>')
+# def send_report(path):
+#     return send_from_directory('build', path)
