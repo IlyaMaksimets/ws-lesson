@@ -6,7 +6,7 @@ import LoginPage from "./components/pages/LoginPage.js";
 import SignUpPage from "./components/pages/SignUpPage.js";
 import HomePage from "./components/pages/HomePage.js";
 
-const socket = io("localhost:5000");
+const socket = io("");
 
 
 function App() {
